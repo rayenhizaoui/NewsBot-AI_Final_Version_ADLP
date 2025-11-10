@@ -1,0 +1,130 @@
+import type { NewsArticle, PerspectiveArticle, ForecastNode, TrendingTopic } from './types';
+
+export const MOCK_NEWS_ARTICLES: NewsArticle[] = [
+  {
+    id: '1',
+    headline: 'Global Summit on AI Regulation Concludes with Landmark Agreement',
+    source: 'Reuters',
+    trustScore: 'A+',
+    bias: 'Center',
+    author: 'Jane Doe',
+    date: 'October 26, 2023',
+    summary: 'Leaders from major tech nations signed a historic pact to establish ethical guidelines for artificial intelligence development and deployment.',
+    sentiment: 'Neutral',
+    topic: 'Geopolitics',
+  },
+  {
+    id: '2',
+    headline: 'Breakthrough in Fusion Energy Could Power Cities by 2040, Scientists Claim',
+    source: 'Associated Press',
+    trustScore: 'A',
+    bias: 'Center',
+    author: 'John Smith',
+    date: 'October 25, 2023',
+    summary: 'A new experimental reactor has sustained a fusion reaction for a record-breaking duration, paving the way for clean, limitless energy.',
+    sentiment: 'Positive',
+    topic: 'Technology',
+  },
+  {
+    id: '3',
+    headline: 'Central Bank Raises Interest Rates Amid Inflation Fears',
+    source: 'Bloomberg',
+    trustScore: 'A+',
+    bias: 'Center-Right',
+    author: 'Emily White',
+    date: 'October 26, 2023',
+    summary: 'The Federal Reserve announced a 25 basis point hike in an effort to curb rising inflation, signaling a more aggressive monetary policy.',
+    sentiment: 'Negative',
+    topic: 'Economics',
+  },
+  {
+    id: '4',
+    headline: 'Webb Telescope Discovers Water Vapor on Potentially Habitable Exoplanet',
+    source: 'NASA News',
+    trustScore: 'A',
+    bias: 'Center',
+    author: 'Dr. Evelyn Reed',
+    date: 'October 24, 2023',
+    summary: 'Analysis of data from the JWST has confirmed the presence of significant water vapor in the atmosphere of exoplanet K2-18b, a key ingredient for life.',
+    sentiment: 'Positive',
+    topic: 'Space',
+  },
+  {
+    id: '5',
+    headline: 'New Gene-Editing Technique Shows Promise in Treating Genetic Disorders',
+    source: 'Science Daily',
+    trustScore: 'B+',
+    bias: 'Center',
+    author: 'David Chen',
+    date: 'October 23, 2023',
+    summary: 'Researchers have developed a more precise version of CRISPR technology that could correct faulty genes without unintended side effects, based on early lab trials.',
+    sentiment: 'Positive',
+    topic: 'Health',
+  },
+  {
+    id: '6',
+    headline: 'Lost Van Gogh Painting Found in Norwegian Attic After 100 Years',
+    source: 'The Art Chronicle',
+    trustScore: 'B',
+    bias: 'Center',
+    author: 'Isabelle Dubois',
+    date: 'October 22, 2023',
+    summary: 'A previously unknown still life by Vincent van Gogh, authenticated by experts, was discovered in an old family estate, offering new insights into his early work.',
+    sentiment: 'Neutral',
+    topic: 'Arts',
+  },
+   {
+    id: '7',
+    headline: 'African Nations Launch Joint Trade Bloc to Boost Regional Economy',
+    source: 'Al Jazeera',
+    trustScore: 'A-',
+    bias: 'Center-Left',
+    author: 'Femi Adebayo',
+    date: 'October 21, 2023',
+    summary: 'A coalition of 15 African countries has officially launched a new trade agreement aimed at reducing tariffs and fostering economic growth across the continent.',
+    sentiment: 'Neutral',
+    topic: 'Geopolitics',
+  },
+];
+
+export const MOCK_PERSPECTIVES: PerspectiveArticle[] = [
+    { id: 'p1', sourceLogo: 'The Guardian', headline: 'AI Pact Hailed as Diplomatic Triumph', bias: 'Left', quote: '"This accord is a monumental step forward, proving that global cooperation on complex technological challenges is not only possible but essential."' },
+    { id: 'p3', sourceLogo: 'Financial Times', headline: 'Tech Stocks Unmoved by Vague AI Framework', bias: 'Center', quote: '"While the agreement sets a positive tone, the lack of concrete enforcement mechanisms means the market impact remains negligible for now."' },
+    { id: 'p2', sourceLogo: 'Wall Street Journal', headline: 'Critics Warn AI Agreement May Stifle Innovation', bias: 'Center-Right', quote: '"The broad, sweeping regulations proposed in this pact could create unnecessary red tape, slowing down crucial research and development in a competitive field."' },
+];
+
+export const MOCK_FORECASTS: { [key: string]: ForecastNode } = {
+    'global-chip-shortage': {
+        id: 'global-chip-shortage',
+        eventName: 'Global Chip Shortage',
+        shortTerm: [
+            { title: 'Increased Smartphone Prices', probability: 65, explanation: 'Reduced chip supply directly impacts manufacturing costs for consumer electronics.' },
+            { title: 'Automotive Production Delays', probability: 80, explanation: 'Modern vehicles rely heavily on semiconductors, leading to factory slowdowns.' },
+        ],
+        mediumTerm: [
+            { title: 'Onshoring of Fab Plants', probability: 70, explanation: 'Nations will invest heavily in domestic chip production to secure supply chains.' },
+            { title: 'Innovation in Chip Design', probability: 55, explanation: 'Scarcity drives research into more efficient and specialized chip architectures.' },
+        ],
+        keyDrivers: [
+            'Recent trade policies',
+            'Supply chain reports',
+            'Market sentiment analysis',
+            'Geopolitical tensions',
+        ],
+    }
+};
+
+export const MOCK_TRENDING_TOPICS: TrendingTopic[] = [
+  { id: 't1', name: 'Quantum Computing', articleCount: 128, imageUrl: 'https://images.pexels.com/photos/17483868/pexels-photo-17483868.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+  { id: 't2', name: 'Sustainable Aviation', articleCount: 94, imageUrl: 'https://images.pexels.com/photos/4672658/pexels-photo-4672658.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+  { id: 't3', name: 'Decentralized Finance', articleCount: 205, imageUrl: 'https://images.pexels.com/photos/6771900/pexels-photo-6771900.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+  { id: 't4', name: 'Gene Editing (CRISPR)', articleCount: 76, imageUrl: 'https://images.pexels.com/photos/207457/pexels-photo-207457.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+  { id: 't5', name: 'Next-Gen Batteries', articleCount: 112, imageUrl: 'https://images.pexels.com/photos/3184328/pexels-photo-3184328.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+  { id: 't6', name: 'Carbon Capture Tech', articleCount: 88, imageUrl: 'https://images.pexels.com/photos/416413/pexels-photo-416413.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+  { id: 't7', name: 'AI in Healthcare', articleCount: 150, imageUrl: 'https://images.pexels.com/photos/5452293/pexels-photo-5452293.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+  { id: 't8', name: 'Vertical Farming', articleCount: 63, imageUrl: 'https://images.pexels.com/photos/10048602/pexels-photo-10048602.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+  { id: 't9', name: 'Space Tourism', articleCount: 45, imageUrl: 'https://images.pexels.com/photos/18443315/pexels-photo-18443315.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+  { id: 't10', name: 'Brain-Computer Interfaces', articleCount: 81, imageUrl: 'https://images.pexels.com/photos/5907604/pexels-photo-5907604.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+  { id: 't11', name: 'Circular Economy', articleCount: 102, imageUrl: 'https://images.pexels.com/photos/3807757/pexels-photo-3807757.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+  { id: 't12', name: 'Ocean Cleanup Tech', articleCount: 55, imageUrl: 'https://images.pexels.com/photos/3971480/pexels-photo-3971480.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1' },
+];

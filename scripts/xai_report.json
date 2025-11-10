@@ -1,0 +1,218 @@
+[
+  {
+    "bullet_index": 1,
+    "bullet_text": "Government launches nationwide solar rollout on public infrastructure.",
+    "lime": [
+      {
+        "token": "government",
+        "weight": 0.01445
+      },
+      {
+        "token": "solar",
+        "weight": 0.013924
+      },
+      {
+        "token": "public",
+        "weight": 0.013644
+      },
+      {
+        "token": "panels",
+        "weight": -0.00386
+      },
+      {
+        "token": "install",
+        "weight": -0.003744
+      },
+      {
+        "token": "announced",
+        "weight": -0.003739
+      },
+      {
+        "token": "buildings",
+        "weight": -0.003515
+      },
+      {
+        "token": "reduce",
+        "weight": -0.003447
+      }
+    ],
+    "shap": [
+      {
+        "token": "government",
+        "weight": 0.023919
+      },
+      {
+        "token": "solar",
+        "weight": 0.023306
+      },
+      {
+        "token": "public",
+        "weight": 0.021775
+      },
+      {
+        "token": "install",
+        "weight": -0.005495
+      },
+      {
+        "token": "announced",
+        "weight": -0.004929
+      },
+      {
+        "token": "buildings.",
+        "weight": -0.00429
+      },
+      {
+        "token": "panels",
+        "weight": -0.003004
+      },
+      {
+        "token": "new",
+        "weight": -0.002284
+      }
+    ]
+  },
+  {
+    "bullet_index": 2,
+    "bullet_text": "Initiative aims to boost clean energy jobs and cut carbon emissions.",
+    "lime": [
+      {
+        "token": "energy",
+        "weight": 0.011669
+      },
+      {
+        "token": "emissions",
+        "weight": 0.011348
+      },
+      {
+        "token": "initiative",
+        "weight": 0.011322
+      },
+      {
+        "token": "jobs",
+        "weight": 0.011046
+      },
+      {
+        "token": "renewable",
+        "weight": -0.004848
+      },
+      {
+        "token": "program",
+        "weight": -0.00449
+      },
+      {
+        "token": "expect",
+        "weight": -0.00447
+      },
+      {
+        "token": "create",
+        "weight": -0.003962
+      }
+    ],
+    "shap": [
+      {
+        "token": "initiative",
+        "weight": 0.019357
+      },
+      {
+        "token": "energy",
+        "weight": 0.018958
+      },
+      {
+        "token": "emissions,",
+        "weight": 0.018216
+      },
+      {
+        "token": "jobs,",
+        "weight": 0.015004
+      },
+      {
+        "token": "expect",
+        "weight": -0.004001
+      },
+      {
+        "token": "reduce",
+        "weight": -0.003264
+      },
+      {
+        "token": "Officials",
+        "weight": -0.003027
+      },
+      {
+        "token": "program",
+        "weight": -0.002937
+      }
+    ]
+  },
+  {
+    "bullet_index": 3,
+    "bullet_text": "Program expected to improve grid resilience during seasonal heatwaves.",
+    "lime": [
+      {
+        "token": "heatwaves",
+        "weight": 0.01416
+      },
+      {
+        "token": "grid",
+        "weight": 0.014109
+      },
+      {
+        "token": "program",
+        "weight": 0.013705
+      },
+      {
+        "token": "summer",
+        "weight": -0.003711
+      },
+      {
+        "token": "power",
+        "weight": -0.003666
+      },
+      {
+        "token": "install",
+        "weight": -0.003645
+      },
+      {
+        "token": "new",
+        "weight": -0.003636
+      },
+      {
+        "token": "buildings",
+        "weight": -0.003557
+      }
+    ],
+    "shap": [
+      {
+        "token": "heatwaves",
+        "weight": 0.024002
+      },
+      {
+        "token": "program",
+        "weight": 0.021928
+      },
+      {
+        "token": "grid",
+        "weight": 0.021601
+      },
+      {
+        "token": "summer",
+        "weight": -0.005242
+      },
+      {
+        "token": "power",
+        "weight": -0.004711
+      },
+      {
+        "token": "energy",
+        "weight": -0.003286
+      },
+      {
+        "token": "stabilize",
+        "weight": -0.001864
+      },
+      {
+        "token": "renewable",
+        "weight": -0.001685
+      }
+    ]
+  }
+]
