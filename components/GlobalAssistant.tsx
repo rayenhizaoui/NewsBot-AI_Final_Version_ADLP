@@ -5,7 +5,7 @@ import { MOCK_NEWS_ARTICLES } from '../constants';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { SendIcon, ChatIcon, CloseIcon, PlusIcon, BotIcon, SparklesIcon, LinkIcon, ExpandIcon, MessageIcon, SettingsIcon } from './icons/IconDefs';
-import { GoogleGenAI, Chat } from '@google/genai';
+import { GoogleGenAI, Chat, ApiError } from '@google/genai';
 
 const LoadingIndicator: React.FC = () => (
   <div className="flex items-center space-x-1">
@@ -183,7 +183,7 @@ const GlobalAssistant: React.FC = () => {
 
         const ai = new GoogleGenAI({ apiKey });
         const newChatInstance = ai.chats.create({
-            model: 'gemini-2.0-flash-exp',
+            model: 'gemini-2.0-flash',
             config: {
               systemInstruction: `You are NewsBot Assistant, a world-class AI research assistant embedded within a sophisticated news intelligence application. Your primary function is to provide users with accurate, timely, and deeply contextualized information about current events.
     
@@ -196,9 +196,7 @@ const GlobalAssistant: React.FC = () => {
     **Interaction Guidelines:**
     - Be objective and neutral in your tone.
     - Present information clearly and concisely.
-    - Format all responses using Markdown for enhanced readability (e.g., use lists, bold text, etc.).
-    - When you use your search tool, you MUST list the web pages you used to form your answer at the end of your response.`,
-              tools: [{googleSearch: {}}],
+    - Format all responses using Markdown for enhanced readability (e.g., use lists, bold text, etc.).`,
             },
         });
         
@@ -328,7 +326,20 @@ const GlobalAssistant: React.FC = () => {
       });
     } catch (error) {
       console.error("Error sending message:", error);
-      const errorMessage = "Sorry, I'm having trouble connecting right now. Please try again later.";
+      let errorMessage = "Sorry, I'm having trouble connecting right now. Please try again later.";
+
+      if (error instanceof ApiError) {
+        if (error.status === 401 || error.status === 403) {
+          errorMessage = `Authentication error (${error.status}). Please double-check your Gemini API key in Settings.`;
+        } else if (error.status === 429) {
+          errorMessage = 'The assistant is receiving too many requests right now. Please wait a few seconds and try again.';
+        } else if (error.message) {
+          errorMessage = `Gemini API error: ${error.message}`;
+        }
+      } else if (error instanceof Error && error.message) {
+        errorMessage = error.message;
+      }
+
       setChats(prev => {
           const updatedChats = { ...prev };
           const currentChat = updatedChats[activeChatId];

@@ -151,3 +151,86 @@ body {
   bottom: 0;
   z-index: 10;
 }
+
+/* Glow effect for highlighted elements */
+.shadow-glow {
+  box-shadow: 0 0 20px rgba(100, 255, 218, 0.5);
+}
+
+/* Line clamp utilities for truncating text */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Smooth gradient background */
+.bg-gradient-radial {
+  background: radial-gradient(circle at center, rgba(100, 255, 218, 0.05) 0%, transparent 70%);
+}
+
+/* Prose improvements for article content */
+.prose-invert {
+  color: #cbd5e1;
+}
+
+.prose-invert h1,
+.prose-invert h2,
+.prose-invert h3,
+.prose-invert h4 {
+  color: #ffffff;
+  font-weight: 700;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+.prose-invert p {
+  margin-bottom: 1.25em;
+  line-height: 1.8;
+}
+
+.prose-invert a {
+  color: #64FFDA;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.prose-invert a:hover {
+  color: #52e3c2;
+  text-decoration: underline;
+}
+
+.prose-invert blockquote {
+  border-left: 4px solid #64FFDA;
+  padding-left: 1rem;
+  font-style: italic;
+  color: #94a3b8;
+}
+
+.prose-invert code {
+  background: rgba(100, 255, 218, 0.1);
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+  color: #64FFDA;
+}
+
+/* Enhanced backdrop blur */
+.backdrop-blur-sm {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Smooth transitions for all interactive elements */
+button,
+a {
+  transition: all 0.2s ease-in-out;
+}

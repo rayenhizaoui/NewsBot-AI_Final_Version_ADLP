@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { MOCK_NEWS_ARTICLES, MOCK_PERSPECTIVES } from '../constants';
 import {
     loadPersistedLiveArticles,
@@ -9,7 +10,7 @@ import {
 } from '../services/newsService';
 import type { NewsArticle, PerspectiveArticle, Bias } from '../types';
 import { useUser } from '../contexts/UserContext';
-import { BackArrowIcon, QuoteIcon } from '../components/icons/IconDefs';
+import { BackArrowIcon, QuoteIcon, ShieldIcon } from '../components/icons/IconDefs';
 import { SummaryIcon, SentimentIcon, EntityIcon, PerspectiveIcon, PollIcon } from '../components/icons/MoreIcons';
 
 const BiasMeter: React.FC<{ bias: Bias }> = ({ bias }) => {
@@ -78,48 +79,98 @@ const AlternativePerspectives: React.FC<{ perspectives: PerspectiveArticle[] }> 
         setSelectedId(perspectives[0]?.id ?? null);
     }, [perspectives]);
 
+    const selectedPerspective = perspectives.find(p => p.id === selectedId);
+
     return (
-        <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-6 h-full">
-            <h3 className="flex items-center space-x-2 text-xl font-bold text-white mb-4">
-                <PerspectiveIcon />
-                <span>Perspectives Spectrum</span>
-            </h3>
-            {!perspectives.length && (
-                <p className="text-slate-500 text-sm">No additional perspectives available right now.</p>
-            )}
-            <div className="relative pt-12 min-h-[180px]">
-                {/* Spectrum Line */}
-                <div className="absolute top-4 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-red-500 rounded-full"></div>
-                <div className="absolute top-3 w-full flex justify-between text-xs text-slate-400">
-                    <span>Left</span>
-                    <span>Center</span>
-                    <span>Right</span>
+        <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-xl shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 p-6 border-b border-slate-800">
+              <h3 className="flex items-center space-x-2 text-2xl font-bold text-white">
+                  <PerspectiveIcon />
+                  <span>Perspectives Spectrum</span>
+              </h3>
+              <p className="text-sm text-slate-400 mt-2">
+                Explore how different sources across the political spectrum cover this story
+              </p>
+            </div>
+            
+            {!perspectives.length ? (
+                <div className="p-12 text-center">
+                  <div className="text-6xl mb-4">🔍</div>
+                  <p className="text-slate-500 text-sm">No additional perspectives available right now.</p>
+                </div>
+            ) : (
+              <div className="p-8">
+                <div className="relative pt-20 pb-8 min-h-[280px]">
+                    {/* Spectrum Line */}
+                    <div className="absolute top-8 w-full h-2 bg-gradient-to-r from-blue-500 via-purple-500 to-red-500 rounded-full shadow-lg"></div>
+                    <div className="absolute top-2 w-full flex justify-between text-xs font-bold text-slate-400 uppercase tracking-wider">
+                        <span>Left</span>
+                        <span>Center</span>
+                        <span>Right</span>
+                    </div>
+
+                    {/* Perspective Cards */}
+                    {perspectives.map(p => (
+                        <motion.div 
+                            key={p.id} 
+                            className="absolute w-56" 
+                            style={{ left: `calc(${biasPositions[p.bias]} - 112px)` }}
+                            onClick={() => setSelectedId(p.id)}
+                            whileHover={{ scale: 1.05, y: -4 }}
+                            whileTap={{ scale: 0.98 }}
+                        >
+                            <div className={`relative bg-slate-800 p-4 rounded-xl shadow-xl hover:shadow-2xl transition-all cursor-pointer group border-2 ${
+                              selectedId === p.id ? 'border-[#64FFDA] ring-2 ring-[#64FFDA]/30' : 'border-slate-700 hover:border-slate-600'
+                            }`}>
+                                <span className={`absolute -top-3 right-3 px-3 py-1 text-[10px] font-bold rounded-full uppercase tracking-wider shadow-lg ${biasAccentMap[p.bias]}`}>
+                                    {p.bias.replace('-', ' ')}
+                                </span>
+                                {/* Connecting Line */}
+                                <div className={`absolute bottom-full left-1/2 w-1 h-12 rounded-full transition-colors ${
+                                  selectedId === p.id ? 'bg-[#64FFDA] shadow-glow' : 'bg-slate-700 group-hover:bg-slate-600'
+                                }`}></div>
+                                
+                                <div className="flex items-center space-x-2 mb-3">
+                                  <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-sm">
+                                    📰
+                                  </div>
+                                  <p className="font-bold text-white text-sm">{p.sourceLogo}</p>
+                                </div>
+                                
+                                <p className="text-slate-300 text-xs font-medium mb-3 line-clamp-2">{p.headline}</p>
+                                
+                                <div className="flex items-start space-x-2 text-slate-400 border-t border-slate-700 pt-3">
+                                    <QuoteIcon />
+                                    <p className="text-xs italic leading-relaxed line-clamp-3">"{p.quote}"</p>
+                                </div>
+                            </div>
+                        </motion.div>
+                    ))}
                 </div>
 
-                {/* Perspective Cards */}
-                {perspectives.map(p => (
-                    <div 
-                        key={p.id} 
-                        className="absolute w-48" 
-                        style={{ left: `calc(${biasPositions[p.bias]} - 96px)` }}
-                        onClick={() => setSelectedId(p.id)}
-                    >
-                        <div className={`relative bg-slate-800 p-3 rounded-lg shadow-lg hover:border-[#64FFDA] transition-all cursor-pointer group border ${selectedId === p.id ? 'border-[#64FFDA]' : 'border-slate-700'}`}>
-                            <span className={`absolute -top-3 right-2 px-2 py-0.5 text-[10px] font-semibold rounded-full uppercase tracking-wide ${biasAccentMap[p.bias]}`}>
-                                {p.bias.replace('-', ' ')}
-                            </span>
-                             {/* Connecting Line */}
-                            <div className={`absolute bottom-full left-1/2 w-0.5 h-8 group-hover:bg-[#64FFDA] transition-colors ${selectedId === p.id ? 'bg-[#64FFDA]' : 'bg-slate-700'}`}></div>
-                            <p className="font-semibold text-white text-sm">{p.sourceLogo}</p>
-                            <p className="text-slate-300 text-xs mb-2">{p.headline}</p>
-                            <div className="flex items-start space-x-2 text-slate-400 border-t border-slate-700 pt-2 mt-2">
-                                <QuoteIcon/>
-                                <p className="text-xs italic">"{p.quote}"</p>
-                            </div>
-                        </div>
+                {/* Selected Perspective Details */}
+                {selectedPerspective && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-8 p-6 bg-slate-800/50 rounded-xl border border-slate-700"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h4 className="text-lg font-bold text-white mb-1">{selectedPerspective.sourceLogo}</h4>
+                        <span className={`inline-block px-3 py-1 text-xs font-bold rounded-full ${biasAccentMap[selectedPerspective.bias]}`}>
+                          {selectedPerspective.bias.replace('-', ' ')} Perspective
+                        </span>
+                      </div>
                     </div>
-                ))}
-            </div>
+                    <p className="text-slate-300 font-medium mb-3">{selectedPerspective.headline}</p>
+                    <blockquote className="border-l-4 border-[#64FFDA] pl-4 py-2 italic text-slate-400 text-sm">
+                      "{selectedPerspective.quote}"
+                    </blockquote>
+                  </motion.div>
+                )}
+              </div>
+            )}
         </div>
     );
 };
@@ -198,60 +249,109 @@ const CommunityPoll: React.FC<CommunityPollProps> = ({ articleId }) => {
         }
     };
 
+    const getOptionColor = (optionId: 'yes' | 'no' | 'unsure') => {
+      switch(optionId) {
+        case 'yes': return 'bg-green-500';
+        case 'no': return 'bg-red-500';
+        case 'unsure': return 'bg-yellow-500';
+      }
+    };
+
+    const getOptionEmoji = (optionId: 'yes' | 'no' | 'unsure') => {
+      switch(optionId) {
+        case 'yes': return '👍';
+        case 'no': return '👎';
+        case 'unsure': return '🤷';
+      }
+    };
+
     const renderResults = () => {
         if (!selectedOption) {
             return null;
         }
 
         return (
-            <div className="mt-4 text-xs text-slate-400 space-y-2">
-                <p className="text-slate-300">
-                    Thanks for weighing in! Here is how the community feels right now:
-                </p>
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              transition={{ duration: 0.3 }}
+              className="mt-6 space-y-3"
+            >
+                <div className="flex items-center space-x-2 text-[#64FFDA] mb-4">
+                  <span className="text-2xl">✓</span>
+                  <p className="text-sm font-semibold">
+                    Thanks for participating! Here's what the community thinks:
+                  </p>
+                </div>
                 {POLL_OPTIONS.map(option => {
                     const votes = tallies[option.id];
                     const percentage = totalVotes > 0
                         ? Math.round((votes / totalVotes) * 100)
                         : 0;
                     return (
-                        <div key={option.id} className="flex items-center justify-between bg-slate-800/60 rounded px-2 py-1">
-                            <span className="font-medium text-white">{option.label}</span>
-                            <span className="text-slate-300">{percentage}% ({votes})</span>
+                        <div key={option.id} className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="font-medium text-white flex items-center space-x-2">
+                              <span>{getOptionEmoji(option.id)}</span>
+                              <span>{option.label}</span>
+                            </span>
+                            <span className="text-slate-400 font-semibold">{percentage}%</span>
+                          </div>
+                          <div className="w-full bg-slate-700 rounded-full h-3 overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${percentage}%` }}
+                              transition={{ duration: 0.5, ease: "easeOut" }}
+                              className={`h-full ${getOptionColor(option.id)} shadow-lg`}
+                            />
+                          </div>
+                          <p className="text-xs text-slate-500">{votes} {votes === 1 ? 'vote' : 'votes'}</p>
                         </div>
                     );
                 })}
-            </div>
+            </motion.div>
         );
     };
 
     return (
-        <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-6 h-full">
-            <h3 className="flex items-center space-x-2 text-xl font-bold text-white mb-4">
-                <PollIcon />
-                <span>Community Poll</span>
-            </h3>
-            <p className="text-slate-300 mb-4 text-sm">
-                After reading multiple perspectives, has your opinion on this topic shifted?
-            </p>
-            <div className="flex space-x-2">
-                {POLL_OPTIONS.map(option => {
-                    const isActive = selectedOption === option.id;
-                    return (
-                        <button
-                            key={option.id}
-                            onClick={() => handleVote(option.id)}
-                            className={`flex-1 font-bold py-2 px-3 rounded transition-colors text-sm border ${
-                                isActive
-                                    ? 'bg-[#64FFDA]/20 text-[#64FFDA] border-[#64FFDA]/60'
-                                    : 'bg-slate-700 hover:bg-slate-600 text-white border-slate-700'
-                            }`}
-                        >
-                            {option.label}
-                        </button>
-                    );
-                })}
+        <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-xl shadow-2xl overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-6 border-b border-slate-800">
+              <h3 className="flex items-center space-x-2 text-2xl font-bold text-white">
+                  <PollIcon />
+                  <span>Community Poll</span>
+              </h3>
+              <p className="text-sm text-slate-400 mt-2">
+                Join {totalVotes} {totalVotes === 1 ? 'reader' : 'readers'} who shared their opinion
+              </p>
             </div>
-            {renderResults()}
+            
+            <div className="p-6">
+              <p className="text-slate-300 mb-6 text-base font-medium leading-relaxed">
+                  After reading multiple perspectives, has your opinion on this topic shifted?
+              </p>
+              <div className="grid grid-cols-3 gap-3">
+                  {POLL_OPTIONS.map(option => {
+                      const isActive = selectedOption === option.id;
+                      return (
+                          <motion.button
+                              key={option.id}
+                              onClick={() => handleVote(option.id)}
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              className={`flex flex-col items-center justify-center py-4 px-3 rounded-xl transition-all text-sm border-2 font-bold ${
+                                  isActive
+                                      ? 'bg-[#64FFDA]/20 text-[#64FFDA] border-[#64FFDA] shadow-lg ring-2 ring-[#64FFDA]/30'
+                                      : 'bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white border-slate-700 hover:border-slate-600'
+                              }`}
+                          >
+                              <span className="text-2xl mb-2">{getOptionEmoji(option.id)}</span>
+                              <span>{option.label}</span>
+                          </motion.button>
+                      );
+                  })}
+              </div>
+              {renderResults()}
+            </div>
         </div>
     );
 };
@@ -313,23 +413,41 @@ const DEFAULT_FULL_ARTICLE_TEXT = `
 
 const DeepDive: React.FC = () => {
     const { id } = useParams<{ id: string }>();
+    const navigate = useNavigate();
     const [article, setArticle] = useState<NewsArticle | null>(null);
     const [activeTab, setActiveTab] = useState('Summary');
-    const { trackArticleView, startReadingTimer } = useUser();
+    const { trackArticleView, startReadingTimer, trackLike, removeLike, trackBookmark, likedArticles } = useUser();
     const readingTimerRef = useRef<(() => void) | null>(null);
 
+    const [liked, setLiked] = useState<boolean>(false);
+    const [bookmarked, setBookmarked] = useState(false);
     const [summaryPoints, setSummaryPoints] = useState<string[]>(DEFAULT_SUMMARY_POINTS);
     const [sentiment, setSentiment] = useState<SentimentBreakdown | null>(DEFAULT_SENTIMENT);
     const [entities, setEntities] = useState<EntityData[]>(DEFAULT_ENTITIES);
     const [fullArticleText, setFullArticleText] = useState<string>(DEFAULT_FULL_ARTICLE_TEXT);
     const [sourceBias, setSourceBias] = useState<Bias>('Center');
     const [perspectives, setPerspectives] = useState<PerspectiveArticle[]>(MOCK_PERSPECTIVES);
+    const [readingProgress, setReadingProgress] = useState(0);
 
   const analysisTabs = [
-    { name: 'Summary', icon: <SummaryIcon /> },
-    { name: 'Bias & Sentiment', icon: <SentimentIcon /> },
-    { name: 'Key Entities', icon: <EntityIcon /> },
+    { name: 'Summary', icon: <SummaryIcon />, description: 'AI-generated key points' },
+    { name: 'Bias & Sentiment', icon: <SentimentIcon />, description: 'Analyze perspective & tone' },
+    { name: 'Key Entities', icon: <EntityIcon />, description: 'People, places & topics' },
   ];
+
+  // Scroll progress tracking
+  useEffect(() => {
+    const handleScroll = () => {
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight - windowHeight;
+      const scrolled = window.scrollY;
+      const progress = (scrolled / documentHeight) * 100;
+      setReadingProgress(Math.min(progress, 100));
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const persisted = typeof window !== 'undefined' ? loadPersistedLiveArticles() : [];
@@ -426,124 +544,360 @@ const DeepDive: React.FC = () => {
             return;
         }
 
-            trackArticleView(article.id, article.topic, article.source);
-            readingTimerRef.current?.();
-            readingTimerRef.current = startReadingTimer(article.id);
+        const isLiked = likedArticles.some(entry => entry.article.id === article.id);
+        setLiked(isLiked);
 
-            return () => {
-                readingTimerRef.current?.();
-                readingTimerRef.current = null;
-            };
-    }, [article, startReadingTimer, trackArticleView]);
+        trackArticleView(article.id, article.topic, article.source);
+        readingTimerRef.current?.();
+        readingTimerRef.current = startReadingTimer(article.id);
+
+        return () => {
+            readingTimerRef.current?.();
+            readingTimerRef.current = null;
+        };
+    }, [article, startReadingTimer, trackArticleView, likedArticles]);
 
   if (!article) {
-    return <div className="p-8 text-white">Article not found.</div>;
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-white mb-4">Article Not Found</h1>
+          <p className="text-slate-400 mb-6">The article you're looking for doesn't exist or has been removed.</p>
+          <button
+            onClick={() => navigate('/')}
+            className="bg-[#64FFDA]/10 text-[#64FFDA] px-6 py-3 rounded-lg hover:bg-[#64FFDA]/20 transition-colors font-semibold"
+          >
+            Return to Home
+          </button>
+        </div>
+      </div>
+    );
   }
+
+  const handleLike = () => {
+    if (liked) {
+      removeLike(article.id);
+      setLiked(false);
+    } else {
+      trackLike(article);
+      setLiked(true);
+    }
+  };
+
+  const handleBookmark = () => {
+    setBookmarked(!bookmarked);
+    if (!bookmarked) {
+      trackBookmark(article.id, article.topic, article.source);
+    }
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: article.headline,
+        text: article.summary,
+        url: window.location.href,
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    }
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
         case 'Summary':
-            return <ul className="list-disc list-inside space-y-2 text-slate-300">
-                {summaryPoints.map((point, index) => <li key={index}>{point}</li>)}
-            </ul>;
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ul className="space-y-3">
+                  {summaryPoints.map((point, index) => (
+                    <li key={index} className="flex items-start space-x-3">
+                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#64FFDA]/20 text-[#64FFDA] flex items-center justify-center text-xs font-bold mt-0.5">
+                        {index + 1}
+                      </span>
+                      <span className="text-slate-300 text-sm leading-relaxed">{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            );
         case 'Bias & Sentiment':
-            return sentiment && <div className="text-slate-300 space-y-4">
+            return sentiment && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
                 <div>
-                    <h4 className="font-semibold text-white mb-2">Sentiment Analysis</h4>
-                    <div className="w-full bg-slate-700 rounded-full h-4 flex overflow-hidden">
-                        <div className="bg-green-500 h-full" style={{width: `${sentiment.positive}%`}} title={`Positive: ${sentiment.positive}%`}></div>
-                        <div className="bg-slate-400 h-full" style={{width: `${sentiment.neutral}%`}} title={`Neutral: ${sentiment.neutral}%`}></div>
-                        <div className="bg-red-500 h-full" style={{width: `${sentiment.negative}%`}} title={`Negative: ${sentiment.negative}%`}></div>
+                    <h4 className="font-semibold text-white mb-3 flex items-center space-x-2">
+                      <span className="w-2 h-2 rounded-full bg-[#64FFDA]"></span>
+                      <span>Sentiment Analysis</span>
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-xs text-slate-400 mb-1">
+                        <span>Positive: {sentiment.positive}%</span>
+                        <span>Neutral: {sentiment.neutral}%</span>
+                        <span>Negative: {sentiment.negative}%</span>
+                      </div>
+                      <div className="w-full bg-slate-700 rounded-full h-3 flex overflow-hidden shadow-inner">
+                        <div className="bg-gradient-to-r from-green-500 to-green-400 h-full transition-all" style={{width: `${sentiment.positive}%`}}></div>
+                        <div className="bg-gradient-to-r from-slate-400 to-slate-300 h-full transition-all" style={{width: `${sentiment.neutral}%`}}></div>
+                        <div className="bg-gradient-to-r from-red-500 to-red-400 h-full transition-all" style={{width: `${sentiment.negative}%`}}></div>
+                      </div>
+                      <p className="text-sm text-slate-400 mt-3 leading-relaxed">{sentiment.summary}</p>
                     </div>
-                    <p className="text-sm text-slate-400 mt-2">{sentiment.summary}</p>
                 </div>
-                <div>
-                    <h4 className="font-semibold text-white mb-2">Source Political Bias</h4>
+                <div className="pt-4 border-t border-slate-700">
+                    <h4 className="font-semibold text-white mb-3 flex items-center space-x-2">
+                      <span className="w-2 h-2 rounded-full bg-purple-400"></span>
+                      <span>Source Political Bias</span>
+                    </h4>
                     <BiasMeter bias={sourceBias}/>
-                    <p className="text-sm text-slate-400 mt-2">
-                        {article.source} is profiled here as a <span className="font-bold text-white">{sourceBias.replace('-', ' ')}</span> outlet, {biasNarrativeMap[sourceBias]}
+                    <p className="text-sm text-slate-400 mt-3 leading-relaxed">
+                        {article.source} is classified as <span className="font-bold text-white">{sourceBias.replace('-', ' ')}</span>, {biasNarrativeMap[sourceBias]}
                     </p>
                 </div>
-            </div>;
+              </motion.div>
+            );
         case 'Key Entities':
-            return <div className="text-slate-300 flex flex-wrap gap-3">
-                {entities.map(entity => <EntityTag key={entity.label} label={entity.label} type={entity.type} />)}
-            </div>;
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {entities.length > 0 ? (
+                  <div className="flex flex-wrap gap-3">
+                    {entities.map(entity => <EntityTag key={entity.label} label={entity.label} type={entity.type} />)}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <EntityIcon />
+                    <p className="text-slate-500 mt-3 text-sm">No entities extracted for this article yet.</p>
+                  </div>
+                )}
+              </motion.div>
+            );
         default:
             return null;
     }
   };
 
   return (
-    <div className="w-full h-screen overflow-y-auto p-8">
-        <Link to="/" className="inline-flex items-center space-x-2 text-slate-400 hover:text-[#64FFDA] mb-6">
-          <BackArrowIcon />
-          <span>Back to Home</span>
-        </Link>
-        <header className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">{article.headline}</h1>
-          <p className="text-slate-400">{article.source} • {article.author} • {article.date}</p>
-        </header>
+    <div className="w-full min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      {/* Reading Progress Bar */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-[#64FFDA] z-50 origin-left"
+        style={{ scaleX: readingProgress / 100 }}
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: readingProgress / 100 }}
+      />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Back Button */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <Link 
+            to="/" 
+            className="inline-flex items-center space-x-2 text-slate-400 hover:text-[#64FFDA] mb-8 group transition-colors"
+          >
+            <BackArrowIcon />
+            <span className="font-medium">Back to Feed</span>
+          </Link>
+        </motion.div>
+
+        {/* Article Header */}
+        <motion.header
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="mb-8"
+        >
+          <div className="flex items-center space-x-3 mb-4">
+            <span className={`px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wide ${
+              article.sentiment === 'Positive' ? 'bg-green-500/20 text-green-300' :
+              article.sentiment === 'Negative' ? 'bg-red-500/20 text-red-300' :
+              'bg-yellow-500/20 text-yellow-300'
+            }`}>
+              {article.sentiment}
+            </span>
+            <span className="px-3 py-1 text-xs font-bold rounded-full bg-blue-500/20 text-blue-300 uppercase tracking-wide">
+              {article.topic}
+            </span>
+          </div>
+          
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
+            {article.headline}
+          </h1>
+          
+          <div className="flex flex-wrap items-center gap-4 text-slate-400 text-sm">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center">
+                <span className="text-xs">📰</span>
+              </div>
+              <span className="font-semibold text-white">{article.source}</span>
+            </div>
+            <span>•</span>
+            <span>{article.author}</span>
+            <span>•</span>
+            <span>{article.date}</span>
+            <span>•</span>
+            <div className="flex items-center space-x-1">
+              <ShieldIcon />
+              <span className="font-semibold text-[#64FFDA]">{article.trustScore}</span>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center space-x-3 mt-6">
+            <button
+              onClick={handleLike}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+                liked 
+                  ? 'bg-red-500/20 text-red-400 border border-red-400/40' 
+                  : 'bg-slate-800 text-slate-400 hover:text-red-400 hover:bg-slate-700 border border-slate-700'
+              }`}
+            >
+              <span>{liked ? '❤️' : '🤍'}</span>
+              <span className="text-sm font-medium">Like</span>
+            </button>
+            
+            <button
+              onClick={handleBookmark}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all ${
+                bookmarked 
+                  ? 'bg-[#64FFDA]/20 text-[#64FFDA] border border-[#64FFDA]/40' 
+                  : 'bg-slate-800 text-slate-400 hover:text-[#64FFDA] hover:bg-slate-700 border border-slate-700'
+              }`}
+            >
+              <span>{bookmarked ? '🔖' : '📑'}</span>
+              <span className="text-sm font-medium">Save</span>
+            </button>
+            
+            <button
+              onClick={handleShare}
+              className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-slate-800 text-slate-400 hover:text-blue-400 hover:bg-slate-700 border border-slate-700 transition-all"
+            >
+              <span>🔗</span>
+              <span className="text-sm font-medium">Share</span>
+            </button>
+          </div>
+        </motion.header>
         
         <div className="grid grid-cols-12 gap-8">
-            {/* Left Column (AI Analysis) */}
-            <div className="col-span-12 lg:col-span-3">
+            {/* Left Sidebar - AI Analysis */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="col-span-12 lg:col-span-4"
+            >
                 <div className="sticky top-8">
-                    <div className="bg-slate-900/50 border border-slate-800 rounded-lg">
-                      <div className="flex flex-col border-slate-800">
-                        {analysisTabs.map(tab => (
-                          <button key={tab.name}
+                    <div className="bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-xl shadow-2xl overflow-hidden">
+                      <div className="bg-gradient-to-r from-[#64FFDA]/10 to-purple-500/10 p-4 border-b border-slate-800">
+                        <h2 className="text-lg font-bold text-white flex items-center space-x-2">
+                          <span className="text-[#64FFDA]">🤖</span>
+                          <span>AI Analysis</span>
+                        </h2>
+                        <p className="text-xs text-slate-400 mt-1">Powered by advanced NLP</p>
+                      </div>
+                      
+                      <div className="flex flex-col">
+                        {analysisTabs.map((tab, index) => (
+                          <motion.button
+                            key={tab.name}
                             onClick={() => setActiveTab(tab.name)}
-                            className={`flex items-center space-x-2 w-full px-4 py-3 font-semibold transition-colors duration-200 text-left border-l-4 ${activeTab === tab.name ? 'text-[#64FFDA] bg-slate-800 border-[#64FFDA]' : 'text-slate-400 hover:text-white border-transparent hover:bg-slate-800/50'}`}>
-                            {tab.icon}
-                            <span>{tab.name}</span>
-                          </button>
+                            whileHover={{ x: 4 }}
+                            whileTap={{ scale: 0.98 }}
+                            className={`flex items-start space-x-3 w-full px-5 py-4 font-semibold transition-all duration-200 text-left border-l-4 ${
+                              activeTab === tab.name 
+                                ? 'text-[#64FFDA] bg-slate-800/80 border-[#64FFDA] shadow-lg' 
+                                : 'text-slate-400 hover:text-white border-transparent hover:bg-slate-800/50'
+                            }`}
+                          >
+                            <div className="mt-0.5">{tab.icon}</div>
+                            <div className="flex-1">
+                              <div className="font-bold">{tab.name}</div>
+                              <div className="text-xs text-slate-500 mt-0.5">{tab.description}</div>
+                            </div>
+                          </motion.button>
                         ))}
                       </div>
                     </div>
-                    <div className="p-6 min-h-[220px] bg-slate-900/50 border border-slate-800 rounded-lg mt-4">
+                    
+                    <div className="p-6 min-h-[300px] bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-xl shadow-2xl mt-4">
                         {renderTabContent()}
                     </div>
                 </div>
-            </div>
+            </motion.div>
 
-            {/* Middle Column (Article) */}
-            <div className="col-span-12 lg:col-span-9">
-                <article className="prose prose-invert max-w-none text-slate-300 bg-slate-900/50 border border-slate-800 rounded-lg p-8">
-                  <h3 className="text-white">Full Article</h3>
-                                    {fullArticleText
-                                        ? fullArticleText
-                                                .split('\n')
-                                                .map(paragraph => paragraph.trim())
-                                                .filter(Boolean)
-                                                .map((paragraph, idx) => (
-                                                    <p key={idx}>{paragraph}</p>
-                                                ))
-                                        : <p className="text-slate-500">No additional article text available.</p>
-                                    }
-                                    {article.readMoreUrl && (
-                                        <a
-                                            href={article.readMoreUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1 text-sm text-[#64FFDA] mt-4 hover:underline"
-                                        >
-                                            Read original source →
-                                        </a>
-                                    )}
+            {/* Main Content - Article */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="col-span-12 lg:col-span-8"
+            >
+                <article className="prose prose-invert prose-lg max-w-none bg-slate-900/80 backdrop-blur-sm border border-slate-800 rounded-xl shadow-2xl p-8 md:p-12">
+                  <h3 className="text-white text-2xl font-bold mb-6 flex items-center space-x-2">
+                    <span>📄</span>
+                    <span>Full Article</span>
+                  </h3>
+                  <div className="text-slate-300 leading-relaxed space-y-4">
+                    {fullArticleText
+                      ? fullArticleText
+                          .split('\n')
+                          .map(paragraph => paragraph.trim())
+                          .filter(Boolean)
+                          .map((paragraph, idx) => (
+                              <p key={idx} className="text-base md:text-lg">{paragraph}</p>
+                          ))
+                      : <p className="text-slate-500 text-center py-8">No additional article text available.</p>
+                    }
+                  </div>
+                  {article.readMoreUrl && (
+                      <a
+                          href={article.readMoreUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-[#64FFDA] bg-[#64FFDA]/10 rounded-lg mt-8 hover:bg-[#64FFDA]/20 transition-colors border border-[#64FFDA]/30"
+                      >
+                          Read original source 
+                          <span>→</span>
+                      </a>
+                  )}
                 </article>
-            </div>
 
-            {/* Perspectives section */}
-            <div className="col-span-12 lg:col-span-9">
-                <AlternativePerspectives perspectives={perspectives} />
-            </div>
+                {/* Alternative Perspectives */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                  className="mt-8"
+                >
+                  <AlternativePerspectives perspectives={perspectives} />
+                </motion.div>
 
-            {/* Poll section */}
-            <div className="col-span-12 lg:col-span-3">
-                <CommunityPoll articleId={article.id} />
-            </div>
+                {/* Community Poll */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
+                  className="mt-8"
+                >
+                  <CommunityPoll articleId={article.id} />
+                </motion.div>
+            </motion.div>
         </div>
+      </div>
     </div>
   );
 };

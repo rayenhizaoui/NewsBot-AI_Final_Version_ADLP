@@ -6,6 +6,7 @@ import type { ArticleFeatures } from '../types/personalization';
 import { MOCK_NEWS_ARTICLES } from '../constants';
 import { TopicIcon } from '../components/icons/MoreIcons';
 import { useUser } from '../contexts/UserContext';
+import { useArchivedArticles } from '../hooks/useArchivedArticles';
 import { personalizationEngine } from '../services/personalizationEngine';
 import {
   fetchLatestArticles,
@@ -112,6 +113,8 @@ const getGreeting = () => {
 };
 
 const Dashboard: React.FC = () => {
+  const { archiveArticle, isArticleArchived } = useArchivedArticles();
+
   const [baseArticles, setBaseArticles] = useState<NewsArticle[]>(() => {
     if (typeof window === 'undefined') {
       return MOCK_NEWS_ARTICLES;
@@ -543,7 +546,9 @@ const Dashboard: React.FC = () => {
 
               <div className="mt-6 space-y-6">
                 {recommendedCount > 0 ? (
-                  filteredArticles.map((article, index) => {
+                  filteredArticles
+                    .filter(article => !isArticleArchived(article.id))
+                    .map((article, index) => {
                     const showBadge = article.recommendationScore && article.recommendationScore > 0.6;
                     return (
                       <div
@@ -559,7 +564,12 @@ const Dashboard: React.FC = () => {
                         )}
 
                         <div onClick={() => handleArticleClick(article)}>
-                          <NewsCard article={article} index={index} />
+                          <NewsCard 
+                            article={article} 
+                            index={index} 
+                            onArchive={archiveArticle}
+                            enableSwipe={true}
+                          />
                         </div>
 
                         {article.recommendationReasons && article.recommendationReasons.length > 0 && (

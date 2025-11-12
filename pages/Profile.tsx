@@ -2,9 +2,13 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ReadIcon, ViewedIcon, FollowedIcon } from '../components/icons/MoreIcons';
 import PersonalizationInsights from '../components/PersonalizationInsights';
 import { useUser } from '../contexts/UserContext';
+import { useArchivedArticles } from '../hooks/useArchivedArticles';
+import { MOCK_NEWS_ARTICLES } from '../constants';
 import { getSupportedTopics } from '../services/newsService';
 
 const Profile: React.FC = () => {
+  const { archivedArticles, unarchiveArticle, clearArchived } = useArchivedArticles();
+
   const {
     profile,
     insights,
@@ -287,6 +291,16 @@ const Profile: React.FC = () => {
 
   const displayedLikedArticles = likedArticles.slice(0, 6);
 
+  // Articles archivés avec les données complètes
+  const archivedArticlesWithData = useMemo(() => {
+    return archivedArticles
+      .map(({ articleId, archivedAt }) => {
+        const article = MOCK_NEWS_ARTICLES.find(a => a.id === articleId);
+        return article ? { article, archivedAt } : null;
+      })
+      .filter(Boolean) as Array<{ article: typeof MOCK_NEWS_ARTICLES[0]; archivedAt: number }>;
+  }, [archivedArticles]);
+
   const displayName = profileInfo?.fullName ?? 'Rayen';
   const displayEmail = profileInfo?.email ?? 'rayen@example.com';
   const displayTitle = profileInfo?.title?.trim();
@@ -527,6 +541,94 @@ const Profile: React.FC = () => {
             <p className="text-slate-400 text-center py-6">
               Tap the heart icon on any article to build your favorites list.
             </p>
+          )}
+        </div>
+      </div>
+
+      {/* Archived Articles - NEW SECTION */}
+      <div className="mb-10">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-bold flex items-center gap-2">
+            <span>🗄️</span>
+            Archived Articles
+          </h3>
+          <div className="flex items-center gap-4">
+            {archivedArticlesWithData.length > 0 && (
+              <>
+                <span className="text-xs text-slate-400">
+                  {archivedArticlesWithData.length} archived
+                </span>
+                <button
+                  onClick={() => {
+                    if (window.confirm('Clear all archived articles?')) {
+                      clearArchived();
+                    }
+                  }}
+                  className="text-xs text-slate-400 hover:text-red-400 transition-colors"
+                >
+                  Clear All
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+        <div className="bg-slate-900/50 border border-slate-800 rounded-lg p-6">
+          {archivedArticlesWithData.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {archivedArticlesWithData.slice(0, 6).map(({ article, archivedAt }) => {
+                const targetUrl = article.readMoreUrl || `#/article/${article.id}`;
+                const isExternal = Boolean(article.readMoreUrl);
+
+                return (
+                  <div
+                    key={`${article.id}-${archivedAt}`}
+                    className="relative group flex flex-col h-full rounded-lg border border-slate-800 bg-gradient-to-br from-slate-900/60 to-slate-800/60 p-5 hover:border-amber-400/50 hover:bg-slate-900/80 transition-all duration-300"
+                  >
+                    {/* Unarchive button */}
+                    <button
+                      onClick={() => unarchiveArticle(article.id)}
+                      className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-700 hover:bg-amber-500 text-white p-2 rounded-lg text-xs font-semibold"
+                      title="Unarchive"
+                    >
+                      ↩️ Restore
+                    </button>
+
+                    <a
+                      href={targetUrl}
+                      target={isExternal ? '_blank' : undefined}
+                      rel={isExternal ? 'noopener noreferrer' : undefined}
+                      className="flex flex-col h-full"
+                    >
+                      <div className="flex items-center justify-between text-xs text-slate-400">
+                        <span className="font-semibold text-slate-300">{article.source}</span>
+                        <span>{formatRelativeTime(archivedAt)}</span>
+                      </div>
+                      <h4 className="text-lg font-semibold text-white mt-3 leading-tight">
+                        {article.headline}
+                      </h4>
+                      <p className="text-slate-400 text-sm mt-3">
+                        {article.summaryBullets?.[0] || article.summary}
+                      </p>
+                      <div className="mt-auto pt-4 flex items-center justify-between text-xs text-slate-500">
+                        <span className="px-2 py-1 rounded-full bg-slate-800/60 text-slate-300">
+                          {article.topic}
+                        </span>
+                        <span>
+                          Trust {article.trustScore}
+                        </span>
+                      </div>
+                    </a>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-10">
+              <p className="text-slate-400 text-sm">No archived articles yet.</p>
+              <p className="text-slate-500 text-xs mt-2">
+                Swipe left on any article in the Home feed to archive it.
+              </p>
+            </div>
           )}
         </div>
       </div>
