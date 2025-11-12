@@ -1,2 +1,2 @@
-localStorage.setItem('gemini_api_key', 'AIzaSyDKmSPtZAUQNoYQtmeG5NJKMEodFyfHQ7c');
+localStorage.setItem('gemini_api_key', 'YOUR_API');
 console.log('API Key configured successfully!');
